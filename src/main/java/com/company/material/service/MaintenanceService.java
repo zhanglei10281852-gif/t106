@@ -169,9 +169,9 @@ public class MaintenanceService {
     }
 
     private BigDecimal getHourlyRate() {
-        return systemConfigRepository.findByConfigKey("repair.hourly.rate")
+        return systemConfigRepository.findByConfigKey("maintenance.hourly.rate")
                 .map(SystemConfig::getAsBigDecimal)
-                .orElse(BigDecimal.valueOf(100));
+                .orElse(BigDecimal.valueOf(80));
     }
 
     @Transactional

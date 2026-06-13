@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -71,19 +72,22 @@ public class SystemConfigController {
 
     @PostMapping("/init-defaults")
     public ResponseEntity<?> initDefaults() {
-        java.util.ArrayList<SystemConfig> created = new java.util.ArrayList<>();
+        ArrayList<SystemConfig> created = new ArrayList<>();
         tryCreate("repair.hourly.rate", "100", "维修工时单价（元/小时）", created);
         tryCreate("maintenance.hourly.rate", "80", "保养工时单价（元/小时）", created);
         tryCreate("high.risk.failure.rate", "0.5", "高风险故障率阈值（次/月）", created);
         tryCreate("high.risk.cost.threshold", "10000", "高风险维修成本阈值（元）", created);
+        String message = created.size() > 0
+                ? "默认配置初始化完成，新建 " + created.size() + " 项，跳过 " + (4 - created.size()) + " 项"
+                : "所有默认配置已存在，无需重复初始化";
         return ResponseEntity.ok(Map.of(
-                "message", "默认配置已初始化",
-                "created", created.size(),
-                "skipped", 4 - created.size()
+                "message", message,
+                "createdCount", created.size(),
+                "skippedCount", 4 - created.size()
         ));
     }
 
-    private void tryCreate(String key, String value, String description, java.util.ArrayList<SystemConfig> created) {
+    private void tryCreate(String key, String value, String description, ArrayList<SystemConfig> created) {
         if (!systemConfigRepository.existsByConfigKey(key)) {
             SystemConfig config = new SystemConfig();
             config.setConfigKey(key);
